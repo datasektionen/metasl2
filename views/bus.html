@@ -5,21 +5,36 @@
     <link rel="stylesheet" href="/public/css/common.css">
     <link rel="stylesheet" href="/public/css/bus.css">
     <script>
-      const events = new EventSource('/subscribe');
-      events.addEventListener('slbus', (bus) => {
-        const data = JSON.parse(bus.data);
-        let fourhtml = '<h3> 4:an </h3>';
-        let otherhtml = '<h3> Others </h3>';
-        data.four.forEach((bus) => {
-          fourhtml += `<div class='bus'><span class='busnr'>${bus.id}</span><span class='dest'>${bus.destination}</span><span class='bustime'>${bus.display}</span></div>`;
+      let events;
+      let backoff = 1;
+      function setupEvents() {
+        events = new EventSource('/subscribe');
+        events.addEventListener('slbus', (bus) => {
+          const data = JSON.parse(bus.data);
+          let fourhtml = '<h3> 4:an </h3>';
+          let otherhtml = '<h3> Others </h3>';
+          data.four.forEach((bus) => {
+            fourhtml += `<div class='bus'><span class='busnr'>${bus.id}</span><span class='dest'>${bus.destination}</span><span class='bustime'>${bus.display}</span></div>`;
+          });
+          data.other.forEach((bus) => {
+            otherhtml += `<div class='bus'><span class='busnr'>${bus.id}</span><span class='dest'>${bus.destination}</span><span class='bustime'>${bus.display}</span></div>`;
+          });
+          document.getElementById("bus4").innerHTML = fourhtml;
+          document.getElementById("busother").innerHTML = otherhtml;
+          document.querySelector("#last-update").innerText = new Date().toLocaleString("sv-SE", { timeZone: "Europe/Stockholm", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
         });
-        data.other.forEach((bus) => {
-          otherhtml += `<div class='bus'><span class='busnr'>${bus.id}</span><span class='dest'>${bus.destination}</span><span class='bustime'>${bus.display}</span></div>`;
+        events.addEventListener('open', () => {
+          backoff = 1;
         });
-        document.getElementById("bus4").innerHTML = fourhtml;
-        document.getElementById("busother").innerHTML = otherhtml;
-        document.querySelector("#last-update").innerText = new Date().toLocaleString("sv-SE", { timeZone: "Europe/Stockholm", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
-      });
+        events.addEventListener('error', () => {
+          // Manually handle errors because it doesn't retry on 502
+          events.close();
+          setTimeout(setupEvents, backoff * 1000);
+          backoff = Math.min(backoff * 2, 60);
+        });
+      }
+
+      setupEvents();
     </script>
   </head>
   <body>
