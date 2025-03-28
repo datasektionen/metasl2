@@ -5,16 +5,31 @@
     <link rel="stylesheet" href="/public/css/common.css">
     <link rel="stylesheet" href="/public/css/tram.css">
     <script>
-      const events = new EventSource('/subscribe');
-      events.addEventListener('sltram', (tram) => {
-        const data = JSON.parse(tram.data);
-        let tramhtml = '<h3> Roslagsbanan </h3>'
-        data.forEach((tram) => {
-          tramhtml += `<div><span class='linenr'>${tram.id}</span><span class='dest'>${tram.destination}</span> <span class='time'>${tram.display}</span></div>`;
+      let events;
+      let backoff = 1;
+      function setupEvents() {
+        events = new EventSource('/subscribe');
+        events.addEventListener('sltram', (tram) => {
+          const data = JSON.parse(tram.data);
+          let tramhtml = '<h3> Roslagsbanan </h3>'
+          data.forEach((tram) => {
+            tramhtml += `<div><span class='linenr'>${tram.id}</span><span class='dest'>${tram.destination}</span> <span class='time'>${tram.display}</span></div>`;
+          });
+          document.getElementById("tram").innerHTML = tramhtml;
+          document.querySelector("#last-update").innerText = new Date().toLocaleString("sv-SE", { timeZone: "Europe/Stockholm", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
         });
-        document.getElementById("tram").innerHTML = tramhtml;
-        document.querySelector("#last-update").innerText = new Date().toLocaleString("sv-SE", { timeZone: "Europe/Stockholm", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
-      });
+        events.addEventListener('open', () => {
+          backoff = 1;
+        });
+        events.addEventListener('error', () => {
+          // Manually handle errors because it doesn't retry on 502
+          events.close();
+          setTimeout(setupEvents, backoff * 1000);
+          backoff = Math.min(backoff * 2, 60);
+        });
+      }
+
+      setupEvents();
     </script>
   </head>
   <body>
