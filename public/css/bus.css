@@ -1,22 +1,15 @@
-#bus4 {
-    float: left;
-}
-
-#busother {
-    float: right;
-}
-
 .buses {
     height: 80vh;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    & > div {
+        flex: 1;
+    }
 }
 
-.buslist {
-    width: 50vw;
-    display: inline-block;
-    background-color: white;
-}
-
-.buslist>h3 {
+.buslist > h3 {
     background-color: #222;
     color: white;
     text-align: center;
@@ -24,40 +17,33 @@
     font-size: 7vh;
 }
 
-.buslist>.bus>span {
+.buslist > .bus {
+    position: relative;
+    color: #fff;
+    padding: 0 2vw 0 1vw;
+    background-color: #333;
     font-size: 5vh;
+
+    &:nth-child(odd) {
+        background-color: #222; /* TODO: maybe change to better color */
+    }
+}
+.buslist:last-child > .bus {
+    padding: 0 1vw 0 2vw;
 }
 
-.buslist>.bus {
-    position: relative;
-}
-.buslist>.bus>span.busnr {
+span.busnr {
     width: 5vw;
     display: inline-block;
     padding-right: 1vw;
     padding-left: 1vw;
 }
 
-.buslist>.bus>span.dest {
-
+span.dest {
 }
 
-.buslist>.bus>span.bustime {
+span.bustime {
     position: absolute;
     right: 0;
     padding-right: 1vw;
-}
-.buslist>.bus:nth-child(odd) {
-    background-color: #222;
-}
-.buslist>.bus:nth-child(even) {
-    background-color: #333;
-}
-.buslist > .bus {
-    color: #fff;
-    width: 45vw;
-    padding: 0 5vw 0 0;
-}
-.buslist:last-child >.bus {
-    padding: 0 0 0 5vw !important;
 }
