@@ -23,27 +23,31 @@
     padding: 0 2vw 0 1vw;
     background-color: #333;
     font-size: 5vh;
+    display: grid;
+    grid-template-columns: 6vw 1fr;
 
     &:nth-child(odd) {
         background-color: #222; /* TODO: maybe change to better color */
     }
+
+    & span.bustime {
+        position: absolute;
+        right: 2vw;
+    }
 }
 .buslist:last-child > .bus {
-    padding: 0 1vw 0 2vw;
-}
+    padding: 0 0 0 2vw;
 
-span.busnr {
-    width: 5vw;
-    display: inline-block;
-    padding-right: 1vw;
-    padding-left: 1vw;
+    & span.bustime {
+        right: 1vw;
+    }
 }
 
 span.dest {
+    padding-left: 2vw;
+    display: inline-block;
 }
 
-span.bustime {
-    position: absolute;
-    right: 0;
-    padding-right: 1vw;
+span.busnr {
+    display: inline-block;
 }
