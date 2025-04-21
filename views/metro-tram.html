@@ -20,7 +20,6 @@
         });
         events.addEventListener('slmetro', (metro) => {
           const data = JSON.parse(metro.data);
-          console.log("Fippel", data)
           metrohtml = '<h3> Metro </h3>'
           metrohtml += '<div class="subtitle"><h4> North </h4></div>';
           data.north.forEach((metro, index) => {
