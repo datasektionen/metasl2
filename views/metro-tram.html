@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title> Metasl2.0 - Metro & Tram</title>
+    <link rel="stylesheet" href="/public/css/common.css">
+    <link rel="stylesheet" href="/public/css/metro-tram.css">
+    <script>
+      let events;
+      let backoff = 1;
+      function setupEvents() {
+        events = new EventSource('/subscribe');
+        events.addEventListener('sltram', (tram) => {
+          const data = JSON.parse(tram.data);
+          let tramhtml = '<h3> Roslagsbanan </h3>'
+          data.forEach((tram) => {
+            tramhtml += `<div><span class='linenr'>${tram.id}</span><span class='dest'>${tram.destination}</span> <span class='time'>${tram.display}</span></div>`;
+          });
+          document.getElementById("tram").innerHTML = tramhtml;
+          document.querySelector("#last-update").innerText = new Date().toLocaleString("sv-SE", { timeZone: "Europe/Stockholm", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+        });
+        events.addEventListener('slmetro', (metro) => {
+          const data = JSON.parse(metro.data);
+          let metrohtml = '<h3> Metro </h3>'
+          metrohtml += '<div class="subtitle"><h4> North </h4></div>';
+          data.north.forEach((metro, index) => {
+            metrohtml += `<div><span class='linenr'>${metro.id}</span><span class='dest'>${metro.destination}</span> <span class='time'>${metro.display}</span></div>`;
+          });
+          metrohtml += '<div class="subtitle"><h4> South </h4></div>';
+          data.south.forEach((metro, index) => {
+            metrohtml += `<div><span class='linenr'>${metro.id}</span><span class='dest'>${metro.destination}</span> <span class='time'>${metro.display}</span></div>`;
+          });
+          document.getElementById("metro").innerHTML = metrohtml;
+          document.querySelector("#last-update").innerText = new Date().toLocaleString("sv-SE", { timeZone: "Europe/Stockholm", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+        });
+        events.addEventListener('open', () => {
+          backoff = 1;
+        });
+        events.addEventListener('error', () => {
+          // Manually handle errors because it doesn't retry on 502
+          events.close();
+          setTimeout(setupEvents, backoff * 1000);
+          backoff = Math.min(backoff * 2, 60);
+        });
+      }
+
+      setupEvents();
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div id='metro'>
+        <h3> Metro </h3>
+        <div class='subtitle'><h4> North </h4></div>
+        <div><span class='linenr'>14</span><span class='dest'> Mörby centrum </span> <span class='time'> 42min </span></div>
+        <div><span class='linenr'>14</span><span class='dest'> Mörby centrum </span> <span class='time'> 42min </span></div>
+        <div><span class='linenr'>14</span><span class='dest'> Mörby centrum </span> <span class='time'> 42min </span></div>
+        <div class='subtitle'><h4> South </h4></div>
+        <div><span class='linenr'>14</span><span class='dest'> Liljeholmen </span> <span class='time'> 42min </span></div>
+        <div><span class='linenr'>14</span><span class='dest'> Fruängen </span> <span class='time'> 42min </span></div>
+        <div><span class='linenr'>14</span><span class='dest'> Liljeholmen </span> <span class='time'> 42min </span></div>
+      </div>
+      <div id='tram'>
+        <h3> Roslagsbanan </h3>
+        <div><span class='linenr'>42</span><span class='dest'> Täby Någonstans </span> <span class='time'> 42min </span></div>
+        <div><span class='linenr'>42</span><span class='dest'> Täby Någonstans </span> <span class='time'> 42min </span></div>
+        <div><span class='linenr'>42</span><span class='dest'> Täby Någonstans </span> <span class='time'> 42min </span></div>
+        <div><span class='linenr'>42</span><span class='dest'> Täby Någonstans </span> <span class='time'> 42min </span></div>
+        <div><span class='linenr'>42</span><span class='dest'> Täby Någonstans </span> <span class='time'> 42min </span></div>
+        <div><span class='linenr'>42</span><span class='dest'> Täby Någonstans </span> <span class='time'> 42min </span></div>
+        <div><span class='linenr'>42</span><span class='dest'> Täby Någonstans </span> <span class='time'> 42min </span></div>
+        <div><span class='linenr'>42</span><span class='dest'> Täby Någonstans </span> <span class='time'> 42min </span></div>
+      </div>
+    </div>
+    <div class="updated-at">
+      Datan hämtades senast <span id="last-update"></span>
+    </div>
+  </body>
+</html>
