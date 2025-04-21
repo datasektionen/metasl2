@@ -34,7 +34,7 @@ div#metro {
         background-color: #333;
         padding: 0 2vw 0 1vw;
         display: grid;
-        grid-template-columns: 5vw 1fr;
+        grid-template-columns: 6vw 1fr;
         position: relative;
     }
 
@@ -53,7 +53,7 @@ div#tram {
         background-color: #333;
         padding: 0 1vw 0 2vw;
         display: grid;
-        grid-template-columns: 5vw 1fr;
+        grid-template-columns: 6vw 1fr;
         position: relative;
     }
 
@@ -65,6 +65,10 @@ div#tram {
         font-size: 5vh;
         color: #fff;
     }
+
+    & span.time {
+        right: 1vw;
+    }
 }
 
 span.dest {
@@ -73,13 +77,10 @@ span.dest {
 }
 
 span.time {
-    padding-right: 2vw;
+    right: 2vw;
     position: absolute;
-    right: 0;
 }
 
 span.linenr {
-    width: 5vw;
     display: inline-block;
-    padding: 0 1vw;
 }
