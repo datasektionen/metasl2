@@ -1,0 +1,86 @@
+.container {
+    height: 80vh;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    & > div {
+        flex: 1;
+    }
+}
+
+h3 {
+    background-color: #222;
+    color: white;
+    text-align: center;
+    padding: 2vh 0;
+    font-size: 7vh;
+}
+
+div#metro > div.subtitle {
+    column-span: all;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    & > h4 {
+        font-size: 5vh;
+        background-color: #333;
+        color: #fff;
+    }
+}
+
+div#metro {
+    & > div {
+        background-color: #333;
+        padding: 0 2vw 0 1vw;
+        display: grid;
+        grid-template-columns: 5vw 1fr;
+        position: relative;
+    }
+
+    & > div:nth-child(odd) {
+        background-color: #222; /* TODO: maybe change to better color */
+    }
+
+    & span {
+        font-size: 5vh;
+        color: #fff;
+    }
+}
+
+div#tram {
+    & > div {
+        background-color: #333;
+        padding: 0 1vw 0 2vw;
+        display: grid;
+        grid-template-columns: 5vw 1fr;
+        position: relative;
+    }
+
+    & > div:nth-child(odd) {
+        background-color: #222; /* TODO: maybe change to better color */
+    }
+
+    & span {
+        font-size: 5vh;
+        color: #fff;
+    }
+}
+
+span.dest {
+    padding-left: 2vw;
+    display: inline-block;
+}
+
+span.time {
+    padding-right: 2vw;
+    position: absolute;
+    right: 0;
+}
+
+span.linenr {
+    width: 5vw;
+    display: inline-block;
+    padding: 0 1vw;
+}
