@@ -7,10 +7,22 @@
     <script>
       let events;
       let backoff = 1;
+      let lastUpdateTime = null;
+
+      function checkDataFreshness() {
+        const now = Date.now();
+        if (lastUpdateTime && (now - lastUpdateTime > 3 * 60 * 1000)) {
+          document.getElementById("outdated-warning").style.display = "block";
+        } else {
+          document.getElementById("outdated-warning").style.display = "none";
+        }
+      }
+
       function setupEvents() {
         events = new EventSource('/subscribe');
         events.addEventListener('slbus', (bus) => {
           const data = JSON.parse(bus.data);
+          lastUpdateTime = Date.now();
           let fourhtml = '<h3> 4:an </h3>';
           let otherhtml = '<h3> Others </h3>';
           data.four.forEach((bus) => {
@@ -21,13 +33,11 @@
           });
           document.getElementById("bus4").innerHTML = fourhtml;
           document.getElementById("busother").innerHTML = otherhtml;
-          document.querySelector("#last-update").innerText = new Date().toLocaleString("sv-SE", { timeZone: "Europe/Stockholm", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
         });
         events.addEventListener('open', () => {
           backoff = 1;
         });
         events.addEventListener('error', () => {
-          // Manually handle errors because it doesn't retry on 502
           events.close();
           setTimeout(setupEvents, backoff * 1000);
           backoff = Math.min(backoff * 2, 60);
@@ -35,9 +45,11 @@
       }
 
       setupEvents();
+      setInterval(checkDataFreshness, 1000);
     </script>
   </head>
   <body>
+    <div id="outdated-warning">⚠️ DATA IS OUTDATED</div>
     <div class='buses'>
       <div id='bus4' class='buslist'>
         <h3> 4:an </h3>
@@ -45,9 +57,6 @@
       <div id='busother' class='buslist'>
         <h3> Other </h3>
       </div>
-    </div>
-    <div class="updated-at">
-      Datan hämtades senast <span id="last-update"></span>
     </div>
   </body>
 </html>

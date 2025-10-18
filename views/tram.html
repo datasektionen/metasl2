@@ -7,22 +7,32 @@
     <script>
       let events;
       let backoff = 1;
+      let lastUpdateTime = null;
+
+      function checkDataFreshness() {
+        const now = Date.now();
+        if (lastUpdateTime && (now - lastUpdateTime > 3 * 60 * 1000)) {
+          document.getElementById("outdated-warning").style.display = "block";
+        } else {
+          document.getElementById("outdated-warning").style.display = "none";
+        }
+      }
+
       function setupEvents() {
         events = new EventSource('/subscribe');
         events.addEventListener('sltram', (tram) => {
           const data = JSON.parse(tram.data);
+          lastUpdateTime = Date.now();
           let tramhtml = '<h3> Roslagsbanan </h3>'
           data.forEach((tram) => {
             tramhtml += `<div><span class='linenr'>${tram.id}</span><span class='dest'>${tram.destination}</span> <span class='time'>${tram.display}</span></div>`;
           });
           document.getElementById("tram").innerHTML = tramhtml;
-          document.querySelector("#last-update").innerText = new Date().toLocaleString("sv-SE", { timeZone: "Europe/Stockholm", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
         });
         events.addEventListener('open', () => {
           backoff = 1;
         });
         events.addEventListener('error', () => {
-          // Manually handle errors because it doesn't retry on 502
           events.close();
           setTimeout(setupEvents, backoff * 1000);
           backoff = Math.min(backoff * 2, 60);
@@ -30,9 +40,11 @@
       }
 
       setupEvents();
+      setInterval(checkDataFreshness, 1000);
     </script>
   </head>
   <body>
+    <div id="outdated-warning">⚠️ DATA IS OUTDATED</div>
     <div id='tram'>
       <h3> Roslagsbanan </h3>
       <div><span class='linenr'>42</span><span class='dest'> Täby Någonstans </span> <span class='time'> 42min </span></div>
@@ -43,9 +55,6 @@
       <div><span class='linenr'>42</span><span class='dest'> Täby Någonstans </span> <span class='time'> 42min </span></div>
       <div><span class='linenr'>42</span><span class='dest'> Täby Någonstans </span> <span class='time'> 42min </span></div>
       <div><span class='linenr'>42</span><span class='dest'> Täby Någonstans </span> <span class='time'> 42min </span></div>
-    </div>
-    <div class="updated-at">
-      Datan hämtades senast <span id="last-update"></span>
     </div>
   </body>
 </html>

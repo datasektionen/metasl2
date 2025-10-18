@@ -7,10 +7,22 @@
     <script>
       let events;
       let backoff = 1;
+      let lastUpdateTime = null;
+
+      function checkDataFreshness() {
+        const now = Date.now();
+        if (lastUpdateTime && (now - lastUpdateTime > 3 * 60 * 1000)) {
+          document.getElementById("outdated-warning").style.display = "block";
+        } else {
+          document.getElementById("outdated-warning").style.display = "none";
+        }
+      }
+
       function setupEvents() {
         events = new EventSource('/subscribe');
         events.addEventListener('slmetro', (metro) => {
           const data = JSON.parse(metro.data);
+          lastUpdateTime = Date.now();
           document.getElementById("g1tcontent").innerHTML = `<span class='dest'>${data.north[0].id} ${data.north[0].destination}</span><span class='time'>${data.north[0].display}</span>`;
           document.getElementById("g2tcontent").innerHTML = `<span class='dest'>${data.south[0].id} ${data.south[0].destination}</span><span class='time'>${data.south[0].display}</span>`;
           let northbottom = '';
@@ -29,13 +41,11 @@
           }
           document.getElementById("g1bcontent").innerHTML = northbottom;
           document.getElementById("g2bcontent").innerHTML = southbottom;
-          document.querySelector("#last-update").innerText = new Date().toLocaleString("sv-SE", { timeZone: "Europe/Stockholm", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
         });
         events.addEventListener('open', () => {
           backoff = 1;
         });
         events.addEventListener('error', () => {
-          // Manually handle errors because it doesn't retry on 502
           events.close();
           setTimeout(setupEvents, backoff * 1000);
           backoff = Math.min(backoff * 2, 60);
@@ -43,9 +53,11 @@
       }
 
       setupEvents();
+      setInterval(checkDataFreshness, 1000);
     </script>
   </head>
   <body>
+    <div id="outdated-warning">⚠️ DATA IS OUTDATED</div>
     <div id="tunnelbana">
       <div id="groupone" class="skylt">
         <div class="top skylttext">
@@ -77,9 +89,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="updated-at">
-      Datan hämtades senast <span id="last-update"></span>
     </div>
   </body>
 </html>

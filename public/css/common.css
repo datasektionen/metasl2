@@ -37,3 +37,19 @@ p#trafiklab a {
     top: 10px;
     right: 10px;
 }
+
+#outdated-warning {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ff0000;
+    color: white;
+    font-size: 8vw;
+    font-weight: bold;
+    padding: 40px 60px;
+    text-align: center;
+    z-index: 9999;
+    border-radius: 10px;
+}
