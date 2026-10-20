@@ -51,6 +51,7 @@ iframe {
     margin-bottom: 60px;
 }
 
+/*
 @keyframes slide-to-left {
     to { transform: translateX(-10%); }
 }
@@ -83,3 +84,4 @@ main {
 ::view-transition-new(sl) {
     animation: 500ms ease-in-out both slide-from-right, 400ms ease-out both fade-in;
 }
+*/
